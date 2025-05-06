@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Eat the Little Fishes!</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: #0b4a5a;
+                font-family: "Arial Black", sans-serif;
+            }
+
+            canvas {
+                border: 3px solid white;
+                background-color: rgb(30, 233, 206);
+            }
+
+            #gameOverText,
+            #winText {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 48px;
+                text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+                text-align: center;
+            }
+
+            #gameOverText {
+                color: #ff4444;
+            }
+
+            #winText {
+                color: #44ff44;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="preload" style="display: none">
+            <img id="mainCharacterImg" src="main_character.svg" />
+            <img id="level1FishImg" src="level1_fish.svg" />
+            <img id="level2FishImg" src="level2_fish.svg" />
+            <img id="deadFishImg" src="dead.svg" />
+            <img id="bonusFishImg" src="blowfish_bonus.svg" />
+            <img id="sharkImg" src="shark.svg" />
+        </div>
+        <div id="gameOverText">GAME OVER!</div>
+        <div id="winText">YOU WIN!</div>
+        <script src="main.js"></script>
+    </body>
+</html>
