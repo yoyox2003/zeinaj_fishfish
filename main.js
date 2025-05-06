@@ -11,13 +11,8 @@ let level2Fish = [];
 let bonusFish;
 let shark;
 // Touch control variables
-let isMobile = false;
-let touchControls = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-};
+let touchActive = false;
+let touchTarget = { x: 0, y: 0 };
 
 const images = {
     mainCharacter: null,
@@ -74,81 +69,45 @@ const gameArea = {
             gameArea.keys[e.keyCode] = false;
         });
 
-        // Check if device is mobile
-        checkMobile();
-
-        // Set up touch controls if on mobile
-        if (isMobile) {
-            setupTouchControls();
-        }
+        // Add touch event handlers
+        this.setupTouchControls();
     },
     clear() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
+    setupTouchControls() {
+        // Handle touch start
+        this.canvas.addEventListener("touchstart", function (e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = gameArea.canvas.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+
+            touchActive = true;
+            touchTarget.x = touchX;
+            touchTarget.y = touchY;
+        });
+
+        // Handle touch move
+        this.canvas.addEventListener("touchmove", function (e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = gameArea.canvas.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+
+            touchTarget.x = touchX;
+            touchTarget.y = touchY;
+        });
+
+        // Handle touch end
+        this.canvas.addEventListener("touchend", function (e) {
+            e.preventDefault();
+            touchActive = false;
+        });
+    },
 };
-
-// Check if we're on a mobile device
-function checkMobile() {
-    isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-        );
-
-    if (isMobile) {
-        const touchControls = document.getElementById("touchControls");
-        touchControls.style.display = "block";
-    }
-}
-
-// Set up touch controls
-function setupTouchControls() {
-    const upBtn = document.getElementById("up");
-    const downBtn = document.getElementById("down");
-    const leftBtn = document.getElementById("left");
-    const rightBtn = document.getElementById("right");
-
-    // Touch start events
-    upBtn.addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        touchControls.up = true;
-    });
-
-    downBtn.addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        touchControls.down = true;
-    });
-
-    leftBtn.addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        touchControls.left = true;
-    });
-
-    rightBtn.addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        touchControls.right = true;
-    });
-
-    // Touch end events
-    upBtn.addEventListener("touchend", function (e) {
-        e.preventDefault();
-        touchControls.up = false;
-    });
-
-    downBtn.addEventListener("touchend", function (e) {
-        e.preventDefault();
-        touchControls.down = false;
-    });
-
-    leftBtn.addEventListener("touchend", function (e) {
-        e.preventDefault();
-        touchControls.left = false;
-    });
-
-    rightBtn.addEventListener("touchend", function (e) {
-        e.preventDefault();
-        touchControls.right = false;
-    });
-}
 
 function startGame() {
     loadImages(() => {
@@ -335,12 +294,17 @@ function updateGameArea() {
         if (gameArea.keys[40]) mainCharacter.speedY = 5;
     }
 
-    // Handle touch controls
-    if (isMobile) {
-        if (touchControls.left) mainCharacter.speedX = -5;
-        if (touchControls.right) mainCharacter.speedX = 5;
-        if (touchControls.up) mainCharacter.speedY = -5;
-        if (touchControls.down) mainCharacter.speedY = 5;
+    // Handle touch controls - move toward touch point
+    if (touchActive) {
+        const dx = touchTarget.x - (mainCharacter.x + mainCharacter.width / 2);
+        const dy = touchTarget.y - (mainCharacter.y + mainCharacter.height / 2);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 5) {
+            // Only move if not very close to target
+            mainCharacter.speedX = (dx * 5) / distance;
+            mainCharacter.speedY = (dy * 5) / distance;
+        }
     }
 
     mainCharacter.update();
